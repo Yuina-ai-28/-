@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ブライダル広告パフォーマンス分析</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="index.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <script type="importmap">
+    {
+      "imports": {
+        "@google/genai": "https://esm.sh/@google/genai@^0.14.0",
+        "marked": "https://esm.sh/marked@^12.0.0",
+        "chart.js": "https://esm.sh/chart.js@^4.4.2/auto"
+      }
+    }
+  </script>
+  <script type="module" src="index.tsx"></script>
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>ブライダル広告パフォーマンス分析</h1>
+      <p>自社の広告キャンペーンと市場データを基に、AIが専門的な分析と戦略を提案します。</p>
+    </header>
+    <main>
+      <div id="input-container">
+        <h2><span class="icon">&#128202;</span> 分析データ入力</h2>
+        <div class="form-group">
+          <label for="goal">主な広告の目標は何ですか？</label>
+          <input type="text" id="goal" placeholder="例：新規来館予約の最大化、CPAを5,000円以下に抑える">
+        </div>
+
+        <div class="campaign-card">
+          <h3>自社キャンペーン</h3>
+           <div class="form-group">
+              <label for="my-region">地域</label>
+              <select id="my-region">
+                <option>Tokyo</option>
+                <option>Hokkaido</option>
+                <option>Aomori</option>
+                <option>Iwate</option>
+                <option>Miyagi</option>
+                <option>Akita</option>
+                <option>Yamagata</option>
+                <option>Fukushima</option>
+                <option>Ibaraki</option>
+                <option>Tochigi</option>
+                <option>Gunma</option>
+                <option>Saitama</option>
+                <option>Chiba</option>
+                <option>Kanagawa</option>
+                <option>Niigata</option>
+                <option>Toyama</option>
+                <option>Ishikawa</option>
+                <option>Fukui</option>
+                <option>Yamanashi</option>
+                <option>Nagano</option>
+                <option>Gifu</option>
+                <option>Shizuoka</option>
+                <option>Aichi</option>
+                <option>Mie</option>
+                <option>Shiga</option>
+                <option>Kyoto</option>
+                <option>Osaka</option>
+                <option>Hyogo</option>
+                <option>Nara</option>
+                <option>Wakayama</option>
+                <option>Tottori</option>
+                <option>Shimane</option>
+                <option>Okayama</option>
+                <option>Hiroshima</option>
+                <option>Yamaguchi</option>
+                <option>Tokushima</option>
+                <option>Kagawa</option>
+                <option>Ehime</option>
+                <option>Kochi</option>
+                <option>Fukuoka</option>
+                <option>Saga</option>
+                <option>Nagasaki</option>
+                <option>Kumamoto</option>
+                <option>Oita</option>
+                <option>Miyazaki</option>
+                <option>Kagoshima</option>
+                <option>Okinawa</option>
+              </select>
+            </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="my-impressions">インプレッション数</label>
+              <input type="number" id="my-impressions" value="100000">
+            </div>
+            <div class="form-group">
+              <label for="my-clicks">クリック数</label>
+              <input type="number" id="my-clicks" value="2000">
+            </div>
+            <div class="form-group">
+              <label for="my-cost">総費用 (¥)</label>
+              <input type="number" id="my-cost" value="400000">
+            </div>
+            <div class="form-group">
+              <label for="my-conversions">コンバージョン数</label>
+              <input type="number" id="my-conversions" value="50">
+            </div>
+          </div>
+          <div class="calculated-metrics" id="my-calculated-metrics"></div>
+          <div class="form-group">
+            <label for="my-memo">広告構成や変更点のメモ</label>
+            <textarea id="my-memo" rows="3" placeholder="例：今月からクリエイティブを動画メインに変更。ターゲット年齢を25-30歳に絞り込み。"></textarea>
+          </div>
+        </div>
+        
+        <div class="campaign-card">
+          <h3>ブライダルマーケット状況</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="market-marriages">年間婚姻数 (組)</label>
+              <input type="number" id="market-marriages" value="50000">
+            </div>
+            <div class="form-group">
+              <label for="market-spend">平均顧客単価 (¥)</label>
+              <input type="number" id="market-spend" value="3500000">
+            </div>
+          </div>
+           <div class="form-group">
+              <label for="market-trends">市場トレンド・季節性など</label>
+              <textarea id="market-trends" rows="3" placeholder="例：6月はジューンブライドで需要増、8月は閑散期"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group toggle-group">
+            <input type="checkbox" id="competitor-toggle">
+            <label for="competitor-toggle">競合キャンペーンの分析を行う</label>
+        </div>
+
+        <div class="campaign-card" id="competitor-card" style="display: none;">
+          <h3>競合キャンペーン</h3>
+           <div class="form-group">
+              <label for="comp-region">地域</label>
+              <select id="comp-region">
+                <option>Tokyo</option>
+                <option>Hokkaido</option>
+                <option>Aomori</option>
+                <option>Iwate</option>
+                <option>Miyagi</option>
+                <option>Akita</option>
+                <option>Yamagata</option>
+                <option>Fukushima</option>
+                <option>Ibaraki</option>
+                <option>Tochigi</option>
+                <option>Gunma</option>
+                <option>Saitama</option>
+                <option>Chiba</option>
+                <option>Kanagawa</option>
+                <option>Niigata</option>
+                <option>Toyama</option>
+                <option>Ishikawa</option>
+                <option>Fukui</option>
+                <option>Yamanashi</option>
+                <option>Nagano</option>
+                <option>Gifu</option>
+                <option>Shizuoka</option>
+                <option>Aichi</option>
+                <option>Mie</option>
+                <option>Shiga</option>
+                <option>Kyoto</option>
+                <option>Osaka</option>
+                <option>Hyogo</option>
+                <option>Nara</option>
+                <option>Wakayama</option>
+                <option>Tottori</option>
+                <option>Shimane</option>
+                <option>Okayama</option>
+                <option>Hiroshima</option>
+                <option>Yamaguchi</option>
+                <option>Tokushima</option>
+                <option>Kagawa</option>
+                <option>Ehime</option>
+                <option>Kochi</option>
+                <option>Fukuoka</option>
+                <option>Saga</option>
+                <option>Nagasaki</option>
+                <option>Kumamoto</option>
+                <option>Oita</option>
+                <option>Miyazaki</option>
+                <option>Kagoshima</option>
+                <option>Okinawa</option>
+              </select>
+            </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="comp-impressions">インプレッション数</label>
+              <input type="number" id="comp-impressions" value="120000">
+            </div>
+            <div class="form-group">
+              <label for="comp-clicks">クリック数</label>
+              <input type="number" id="comp-clicks" value="1800">
+            </div>
+            <div class="form-group">
+              <label for="comp-cost">総費用 (¥)</label>
+              <input type="number" id="comp-cost" value="300000">
+            </div>
+            <div class="form-group">
+              <label for="comp-conversions">コンバージョン数</label>
+              <input type="number" id="comp-conversions" value="60">
+            </div>
+          </div>
+           <div class="calculated-metrics" id="comp-calculated-metrics"></div>
+        </div>
+        <button id="analyze-button">
+          <span class="button-text">パフォーマンスを分析</span>
+          <div class="spinner" style="display: none;"></div>
+        </button>
+      </div>
+      <div id="output-container">
+        <h2><span class="icon">&#128161;</span> 分析と推奨事項</h2>
+        <div id="chart-container" style="display: none;">
+          <canvas id="metrics-chart"></canvas>
+        </div>
+        <div id="output-content" class="placeholder">
+          AIによる分析結果はここに表示されます。キャンペーンデータを入力し、「パフォーマンスを分析」をクリックしてください。
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
